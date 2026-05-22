@@ -20,6 +20,40 @@ function money(value?: number): string {
     : "";
 }
 
+function marketplaceModel(listing: ListingEntry): string {
+  return [listing.vehicle.model, listing.vehicle.trim].filter(Boolean).join(" ");
+}
+
+function marketplaceTransmission(value: string): string {
+  const text = value.toLowerCase();
+  if (!value) return "";
+  if (text.includes("manual")) return "Manual transmission";
+  return "Automatic transmission";
+}
+
+function marketplaceFuelType(value: string): string {
+  const text = value.toLowerCase();
+  if (text.includes("hybrid")) return "Hybrid";
+  if (text.includes("electric")) return "Electric";
+  if (text.includes("diesel")) return "Diesel";
+  if (text.includes("gas")) return "Gasoline";
+  return value;
+}
+
+function marketplaceBodyStyle(listing: ListingEntry): string {
+  const body = listing.vehicle.body_style;
+  if (body) return body.replace(/^4D\s+/i, "").trim();
+
+  const title = listing.marketplace.title.toLowerCase();
+  if (title.includes("cr-v") || title.includes("hr-v") || title.includes("pilot")) {
+    return "SUV";
+  }
+  if (title.includes("odyssey")) return "Minivan";
+  if (title.includes("ridgeline")) return "Truck";
+  if (title.includes("civic") || title.includes("accord")) return "Sedan";
+  return "";
+}
+
 function buildFinanceText(listing: ListingEntry): string {
   const finance = listing.marketplace.financing ?? listing.vehicle.financing;
   if (!finance?.monthly_payment) return "";
@@ -98,8 +132,11 @@ export function ListingDetail({
   const m = listing.marketplace;
   const v = listing.vehicle;
   const photos = listing.photos.length ? listing.photos : listing.photoUrls;
-  const location = [m.location.city, m.location.state].filter(Boolean).join(", ");
+  const location = m.location.city || [m.location.city, m.location.state].filter(Boolean).join(", ");
   const priceValue = m.price ? String(m.price) : "";
+  const monthlyValue = listing.marketplace.financing?.monthly_payment
+    ? String(listing.marketplace.financing.monthly_payment)
+    : "";
   const financeText = buildFinanceText(listing);
 
   const flash = (msg: string) => {
@@ -154,12 +191,28 @@ export function ListingDetail({
             <p>Copy these into the Facebook vehicle listing form.</p>
           </div>
           <div className="field-grid">
-            <FieldCopy label="Vehicle type" value="Car/truck" onCopy={copy} />
+            <FieldCopy label="Vehicle type" value="Car/van" onCopy={copy} />
             <FieldCopy label="Location" value={location} onCopy={copy} />
             <FieldCopy label="Year" value={String(v.year || "")} onCopy={copy} />
             <FieldCopy label="Make" value={v.make} onCopy={copy} />
-            <FieldCopy label="Model" value={v.model} onCopy={copy} />
+            <FieldCopy label="Model" value={marketplaceModel(listing)} onCopy={copy} />
+            <FieldCopy label="Mileage" value={v.mileage ? String(v.mileage) : ""} onCopy={copy} />
             <FieldCopy label="Price" value={priceValue} onCopy={copy} />
+            {monthlyValue && (
+              <FieldCopy label="Monthly payment" value={monthlyValue} onCopy={copy} />
+            )}
+            <FieldCopy label="Body style" value={marketplaceBodyStyle(listing)} onCopy={copy} />
+            <FieldCopy label="Exterior colour" value={v.exterior_color} onCopy={copy} />
+            <FieldCopy label="Interior colour" value={v.interior_color} onCopy={copy} />
+            <FieldCopy label="Clean title" value="Yes" onCopy={copy} />
+            <FieldCopy label="No significant damage/problems" value="Yes" onCopy={copy} />
+            <FieldCopy label="Vehicle condition" value="Very good" onCopy={copy} />
+            <FieldCopy label="Fuel type" value={marketplaceFuelType(v.fuel_type)} onCopy={copy} />
+            <FieldCopy
+              label="Transmission"
+              value={marketplaceTransmission(v.transmission)}
+              onCopy={copy}
+            />
             {financeText && (
               <FieldCopy
                 label="Finance"

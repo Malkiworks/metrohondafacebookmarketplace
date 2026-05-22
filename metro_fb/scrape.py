@@ -203,6 +203,7 @@ def _parse_fallback_vehicle(url: str, html: str, soup: BeautifulSoup) -> Vehicle
             image_urls.append(src)
 
     body, drivetrain, fuel_type = _parse_body_and_drivetrain(soup, html)
+    fuel_type = str(car.get("fuelType") or fuel_type or "")
     body = body or _first_value(data, "vehicle_body_style")
     fuel_type = fuel_type or _first_value(data, "vehicle_engine_fuel")
 

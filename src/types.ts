@@ -25,8 +25,11 @@ export interface VehicleRecord {
   title: string;
   price: number;
   mileage: number;
+  body_style: string;
   exterior_color: string;
+  interior_color: string;
   transmission: string;
+  fuel_type: string;
   dealer_url: string;
   image_urls: string[];
   financing?: {
