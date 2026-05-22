@@ -72,7 +72,13 @@ export default function App() {
           <p className="subtitle">
             Jersey City · {inventory.count} vehicles
             {inventory.refreshing && (
-              <span className="live"> · refreshing live inventory…</span>
+              <span className="live">
+                {" "}
+                · {inventory.refreshStage ?? "refreshing live inventory"}
+                {inventory.refreshTotal
+                  ? ` (${inventory.refreshCompleted ?? 0}/${inventory.refreshTotal})`
+                  : ""}
+              </span>
             )}
             {contactMethod === "phone" && phone ? (
               <> · Leads to <strong>{phone}</strong></>

@@ -55,4 +55,7 @@ export interface InventoryData {
   lastError?: string | null;
   lastRefreshStartedAt?: string | null;
   lastRefreshFinishedAt?: string | null;
+  refreshCompleted?: number;
+  refreshTotal?: number;
+  refreshStage?: string;
 }
