@@ -69,6 +69,10 @@ def build_marketplace_description(
         lines.append("")
         lines.append(footer)
 
+    if vehicle.stock_number:
+        lines.append("")
+        lines.append(f"Stock # {vehicle.stock_number}")
+
     return "\n".join(lines)
 
 
