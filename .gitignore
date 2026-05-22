@@ -7,6 +7,7 @@ output/
 _probe*
 probe_*.py
 *.html
+!index.html
 .venv/
 
 node_modules/
