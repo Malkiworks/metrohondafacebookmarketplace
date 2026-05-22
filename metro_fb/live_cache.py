@@ -12,9 +12,10 @@ from metro_fb.models import Vehicle
 from metro_fb.scrape import scrape_vehicle_urls_fast
 from metro_fb.sitemap import fetch_sitemap_urls, filter_vehicle_urls
 
-DATA_DIR = Path("data")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = PROJECT_ROOT / "data"
 INVENTORY_FILE = DATA_DIR / "inventory.json"
-WEB_INVENTORY = Path("public/data/inventory.json")
+WEB_INVENTORY = PROJECT_ROOT / "public" / "data" / "inventory.json"
 
 
 class InventoryCache:

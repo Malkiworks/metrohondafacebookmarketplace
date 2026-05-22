@@ -5,15 +5,14 @@ from typing import Any
 
 import yaml
 
-DEFAULT_CONFIG_PATH = Path("config.yaml")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_CONFIG_PATH = PROJECT_ROOT / "config.yaml"
+EXAMPLE_CONFIG_PATH = PROJECT_ROOT / "config.example.yaml"
 
 
 def load_config(path: Path | None = None) -> dict[str, Any]:
     config_path = path or DEFAULT_CONFIG_PATH
     if not config_path.exists():
-        example = Path("config.example.yaml")
-        raise FileNotFoundError(
-            f"Missing {config_path}. Copy {example} to config.yaml and edit it."
-        )
+        config_path = EXAMPLE_CONFIG_PATH
     with config_path.open(encoding="utf-8") as f:
         return yaml.safe_load(f) or {}

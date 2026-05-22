@@ -11,8 +11,9 @@ from metro_fb.facebook_listing import build_listing_payload
 from metro_fb.models import Vehicle
 from metro_fb.photos import download_vehicle_photos
 
-PUBLIC_DIR = Path("public")
-DATA_DIR = Path("data")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PUBLIC_DIR = PROJECT_ROOT / "public"
+DATA_DIR = PROJECT_ROOT / "data"
 INVENTORY_FILE = DATA_DIR / "inventory.json"
 WEB_INVENTORY = PUBLIC_DIR / "data" / "inventory.json"
 WEB_CONFIG = PUBLIC_DIR / "site-config.json"

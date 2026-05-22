@@ -12,6 +12,8 @@ from fastapi.staticfiles import StaticFiles
 from metro_fb.config import load_config
 from metro_fb.live_cache import cache
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 app = FastAPI(title="Metro Honda Marketplace")
 
 app.add_middleware(
@@ -58,19 +60,27 @@ def health() -> dict:
     return {"ok": True, "refreshing": cache.refreshing}
 
 
-dist = Path("dist")
-if dist.exists():
-    app.mount("/assets", StaticFiles(directory=dist / "assets"), name="assets")
-    public_data = Path("public/data")
-    if public_data.exists():
-        app.mount("/data", StaticFiles(directory=public_data), name="data")
+dist = PROJECT_ROOT / "dist"
+assets = dist / "assets"
+if assets.exists():
+    app.mount("/assets", StaticFiles(directory=assets), name="assets")
 
-    @app.get("/{path:path}")
-    def spa(path: str) -> FileResponse:
-        file_path = dist / path
-        if path and file_path.exists() and file_path.is_file():
-            return FileResponse(file_path)
-        return FileResponse(dist / "index.html")
+public_data = PROJECT_ROOT / "public" / "data"
+if public_data.exists():
+    app.mount("/data", StaticFiles(directory=public_data), name="data")
+
+
+@app.get("/{path:path}", response_model=None)
+def spa(path: str):
+    index = dist / "index.html"
+    file_path = dist / path
+    if path and file_path.exists() and file_path.is_file():
+        return FileResponse(file_path)
+    if index.exists():
+        return FileResponse(index)
+    return {
+        "detail": "Frontend build not found. Run `npm run build` before starting the server."
+    }
 
 
 def main() -> None:
