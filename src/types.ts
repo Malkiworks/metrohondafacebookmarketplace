@@ -29,6 +29,17 @@ export interface VehicleRecord {
   transmission: string;
   dealer_url: string;
   image_urls: string[];
+  financing?: {
+    monthly_payment?: number;
+    term_months?: number;
+    due_at_signing?: number;
+    apr?: number;
+    amount_financed?: number;
+    selling_price?: number;
+    provider?: string;
+    credit_score?: number;
+    vin?: string;
+  };
 }
 
 export interface MarketplaceListing {
@@ -37,6 +48,7 @@ export interface MarketplaceListing {
   price_formatted: string;
   description: string;
   location: { city: string; state: string };
+  financing?: VehicleRecord["financing"];
 }
 
 export interface ListingEntry {

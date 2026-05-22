@@ -28,6 +28,7 @@ class Vehicle:
     stock_number: str
     image_urls: list[str] = field(default_factory=list)
     features: list[str] = field(default_factory=list)
+    financing: dict[str, Any] = field(default_factory=dict)
     dealer_url: str = ""
     scraped_at: str = ""
 

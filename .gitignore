@@ -15,8 +15,12 @@ node_modules/
 !dist/index.html
 !dist/assets/
 !dist/assets/**
+!dist/data/
+!dist/data/inventory.json
 !dist/site-config.json
 !dist/site-config.example.json
+!public/data/
+!public/data/inventory.json
 
 # Large photo cache — regenerate with npm run data before deploy
 public/data/photos/

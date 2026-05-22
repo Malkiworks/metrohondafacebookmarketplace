@@ -24,6 +24,56 @@ def _first_offer(car: dict[str, Any]) -> dict[str, Any]:
     return {}
 
 
+def _num(value: Any) -> int | float | None:
+    try:
+        if value in (None, ""):
+            return None
+        number = float(value)
+        return int(number) if number.is_integer() else number
+    except (TypeError, ValueError):
+        return None
+
+
+def _parse_financing(offer: dict[str, Any], vin: str, price: int) -> dict[str, Any]:
+    methods = offer.get("acceptedPaymentMethod") or []
+    if isinstance(methods, dict):
+        methods = [methods]
+    if not isinstance(methods, list) or not methods:
+        return {}
+
+    method = next((m for m in methods if isinstance(m, dict)), None)
+    if not method:
+        return {}
+
+    repayment = method.get("loanRepaymentForm") or {}
+    amount = method.get("amount") or {}
+    loan_term = method.get("loanTerm") or {}
+    apr = method.get("annualPercentageRate") or {}
+    down_payment = repayment.get("downPayment") or {}
+    monthly = repayment.get("loanPaymentAmount") or {}
+
+    monthly_payment = _num(monthly.get("value"))
+    term_months = _num(loan_term.get("value"))
+    amount_financed = _num(amount.get("value"))
+    apr_value = _num(apr.get("value"))
+    due_at_signing = _num(down_payment.get("value"))
+
+    if not any([monthly_payment, term_months, amount_financed, apr_value, due_at_signing]):
+        return {}
+
+    return {
+        "monthly_payment": monthly_payment,
+        "term_months": term_months,
+        "due_at_signing": due_at_signing,
+        "apr": apr_value,
+        "amount_financed": amount_financed,
+        "selling_price": price or None,
+        "provider": "Honda Financial Services",
+        "credit_score": 800,
+        "vin": vin,
+    }
+
+
 def _mileage(car: dict[str, Any]) -> int:
     odo = car.get("mileageFromOdometer") or {}
     if isinstance(odo, dict):
@@ -179,6 +229,7 @@ def _parse_fallback_vehicle(url: str, html: str, soup: BeautifulSoup) -> Vehicle
         stock_number=_first_value(data, "vehicle_stock"),
         image_urls=image_urls,
         features=_parse_features(soup),
+        financing={},
         dealer_url=url,
         scraped_at=datetime.now(timezone.utc).isoformat(),
     )
@@ -253,6 +304,7 @@ def parse_vehicle_page(url: str, html: str) -> Vehicle | None:
         stock_number=str(car.get("sku") or ""),
         image_urls=[u for u in images if isinstance(u, str)],
         features=_parse_features(soup),
+        financing=_parse_financing(offer, vin, price),
         dealer_url=dealer_url,
         scraped_at=datetime.now(timezone.utc).isoformat(),
     )

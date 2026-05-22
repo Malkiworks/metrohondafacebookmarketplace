@@ -112,10 +112,10 @@ class InventoryCache:
 
             self.refresh_total = len(urls)
             self.refresh_stage = "showing sitemap vehicles"
-            vehicles_by_key = {
-                self._vehicle_key(vehicle): vehicle
-                for vehicle in [self._vehicle_from_url(url) for url in urls]
-            }
+            vehicles_by_key = self._existing_vehicles_by_key()
+            for url in urls:
+                placeholder = self._vehicle_from_url(url)
+                vehicles_by_key.setdefault(self._vehicle_key(placeholder), placeholder)
             self._write_inventory(list(vehicles_by_key.values()))
             export_web_data(config, download_photos=False)
 
@@ -170,6 +170,23 @@ class InventoryCache:
     def _vehicle_key(self, vehicle: Vehicle) -> str:
         return vehicle.listing_id or vehicle.vin or vehicle.url
 
+    def _existing_vehicles_by_key(self) -> dict[str, Vehicle]:
+        existing: dict[str, Vehicle] = {}
+        payload = self.read_web_inventory()
+        if not payload:
+            return existing
+
+        for listing in payload.get("listings", []):
+            vehicle_data = listing.get("vehicle") if isinstance(listing, dict) else None
+            if not isinstance(vehicle_data, dict):
+                continue
+            try:
+                vehicle = Vehicle(**vehicle_data)
+            except TypeError:
+                continue
+            existing[self._vehicle_key(vehicle)] = vehicle
+        return existing
+
     def _vehicle_from_url(self, url: str) -> Vehicle:
         listing_match = re.search(r"/(\d+)/?$", url)
         listing_id = listing_match.group(1) if listing_match else url
@@ -220,6 +237,7 @@ class InventoryCache:
             stock_number="",
             image_urls=[],
             features=[],
+            financing={},
             dealer_url=url,
             scraped_at=datetime.now(timezone.utc).isoformat(),
         )
