@@ -10,7 +10,6 @@ probe_*.py
 .venv/
 
 node_modules/
-dist/
 
 # Large photo cache — regenerate with npm run data before deploy
 public/data/photos/

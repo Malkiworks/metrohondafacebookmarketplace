@@ -1,0 +1,16 @@
+{
+  "seller": {
+    "display_name": "Your Name",
+    "phone": "201-555-0100",
+    "location_city": "Jersey City",
+    "location_state": "NJ"
+  },
+  "dealer": {
+    "name": "Metro Honda",
+    "city": "Jersey City",
+    "state": "NJ"
+  },
+  "facebook": {
+    "footer": "Serious buyers only. Available for test drive in Jersey City."
+  }
+}
