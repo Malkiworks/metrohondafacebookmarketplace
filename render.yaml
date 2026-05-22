@@ -1,0 +1,11 @@
+# Render web service. This is intentionally not a pure Static Site because
+# real-time inventory refresh requires a backend cache.
+services:
+  - type: web
+    name: metro-honda-marketplace
+    runtime: python
+    buildCommand: pip install -r requirements.txt && npm install && npm run build
+    startCommand: python -m metro_fb.server --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8

@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.env
+config.yaml
+data/
+output/
+_probe*
+probe_*.py
+*.html
+.venv/
+
+node_modules/
+dist/
+
+# Large photo cache — regenerate with npm run data before deploy
+public/data/photos/

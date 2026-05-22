@@ -1,0 +1,21 @@
+{
+  "seller": {
+    "display_name": "Janine Pretorius",
+    "contact_method": "facebook",
+    "phone": "",
+    "location_city": "Jersey City",
+    "location_state": "NJ"
+  },
+  "dealer": {
+    "name": "Metro Honda",
+    "website": "https://www.mymetrohonda.com",
+    "city": "Jersey City",
+    "state": "NJ",
+    "zip": "07305"
+  },
+  "facebook": {
+    "category": "Cars & Trucks",
+    "include_vin_in_description": false,
+    "footer": "Serious buyers only. Available for test drive in Jersey City."
+  }
+}

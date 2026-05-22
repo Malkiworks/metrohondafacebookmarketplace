@@ -1,0 +1,35 @@
+# Copy to config.yaml and fill in your details.
+
+dealer:
+  name: Metro Honda
+  website: https://www.mymetrohonda.com
+  city: Jersey City
+  state: NJ
+  zip: "07305"
+
+# Your personal Marketplace seller profile (for private leads)
+seller:
+  display_name: "Alex"  # first name only is fine on Marketplace
+  contact_method: facebook  # facebook = buyers message your Marketplace profile
+  phone: ""  # only used when contact_method: phone
+  location_city: Jersey City
+  location_state: NJ
+
+scrape:
+  # Jersey City inventory sitemap (bypasses Cloudflare on listing URLs)
+  sitemap_url: https://www.mymetrohonda.com/resrc/xmlsitemap/sitemap-inventory-search/jersey_city-nj-07305/
+  condition: used  # used | new | all
+  make_filter: honda  # honda matches your URL; use null for all used makes
+  max_vehicles: null  # cap per run; null = scrape entire sitemap
+  delay_seconds: 2  # pause between detail page requests
+  workers: 12  # live cache refresh concurrency
+  download_photos: false  # false = faster; photos load from URLs in the web UI
+  max_photos_per_vehicle: 20  # Facebook allows up to 20 images
+
+facebook:
+  # Marketplace category for vehicles
+  category: Cars & Trucks
+  # Tone for descriptions — keep factual, no dealer promo spam (FB flags that)
+  include_vin_in_description: false
+  # Optional line appended to every listing
+  footer: "Serious buyers only. Available for test drive in Jersey City."
