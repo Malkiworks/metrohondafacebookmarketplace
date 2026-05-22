@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ListingEntry } from "../types";
 import { copyText } from "../lib/clipboard";
-import { buildCopyBlock, downloadPhotosZip } from "../lib/downloads";
+import { downloadPhotosZip } from "../lib/downloads";
 import { setPosted } from "../lib/storage";
 
 interface Props {
@@ -13,12 +13,6 @@ interface Props {
 
 const FB_CREATE =
   "https://www.facebook.com/marketplace/create/vehicle";
-
-function money(value?: number): string {
-  return typeof value === "number" && value > 0
-    ? `$${Math.round(value).toLocaleString()}`
-    : "";
-}
 
 function marketplaceModel(listing: ListingEntry): string {
   return [listing.vehicle.model, listing.vehicle.trim].filter(Boolean).join(" ");
@@ -52,47 +46,6 @@ function marketplaceBodyStyle(listing: ListingEntry): string {
   if (title.includes("ridgeline")) return "Truck";
   if (title.includes("civic") || title.includes("accord")) return "Sedan";
   return "";
-}
-
-function buildFinanceText(listing: ListingEntry): string {
-  const finance = listing.marketplace.financing ?? listing.vehicle.financing;
-  if (!finance?.monthly_payment) return "";
-
-  const monthly = money(finance.monthly_payment);
-  const due = money(finance.due_at_signing);
-  const amountFinanced = money(finance.amount_financed);
-  const sellingPrice = money(finance.selling_price || listing.marketplace.price);
-  const term = finance.term_months;
-  const apr = finance.apr;
-  const creditScore = finance.credit_score ?? 800;
-  const provider = finance.provider || "Honda Financial Services";
-  const vin = finance.vin || listing.vehicle.vin;
-
-  const details = [
-    `Estimated payment based on ${creditScore} credit score`,
-    term ? `${term} month term` : "",
-    apr ? `at ${apr}% APR` : "",
-  ]
-    .filter(Boolean)
-    .join(", ");
-
-  const priceDetails = [
-    sellingPrice ? `Payment based on a selling price of ${sellingPrice}` : "",
-    due ? `a ${due} down payment toward loan` : "",
-    amountFinanced ? `for a final amount financed of ${amountFinanced}` : "",
-  ]
-    .filter(Boolean)
-    .join(", ");
-
-  return [
-    "FINANCE",
-    `${monthly}/month`,
-    `${term ? `${term} Months` : ""}${due ? `/${due} Due at Signing` : ""}`,
-    `${details}, financed through ${provider}. Not all buyers will qualify for these terms and a final credit report will be required to verify eligibility.`,
-    `${priceDetails}. Excludes tax, title and licensing.${vin ? ` Based on VIN# ${vin}.` : ""}`,
-  ]
-    .filter(Boolean)
-    .join("\n");
 }
 
 interface FieldCopyProps {
@@ -134,10 +87,6 @@ export function ListingDetail({
   const photos = listing.photos.length ? listing.photos : listing.photoUrls;
   const location = m.location.city || [m.location.city, m.location.state].filter(Boolean).join(", ");
   const priceValue = m.price ? String(m.price) : "";
-  const monthlyValue = listing.marketplace.financing?.monthly_payment
-    ? String(listing.marketplace.financing.monthly_payment)
-    : "";
-  const financeText = buildFinanceText(listing);
 
   const flash = (msg: string) => {
     setToast(msg);
@@ -198,9 +147,6 @@ export function ListingDetail({
             <FieldCopy label="Model" value={marketplaceModel(listing)} onCopy={copy} />
             <FieldCopy label="Mileage" value={v.mileage ? String(v.mileage) : ""} onCopy={copy} />
             <FieldCopy label="Price" value={priceValue} onCopy={copy} />
-            {monthlyValue && (
-              <FieldCopy label="Monthly payment" value={monthlyValue} onCopy={copy} />
-            )}
             <FieldCopy label="Body style" value={marketplaceBodyStyle(listing)} onCopy={copy} />
             <FieldCopy label="Exterior colour" value={v.exterior_color} onCopy={copy} />
             <FieldCopy label="Interior colour" value={v.interior_color} onCopy={copy} />
@@ -213,14 +159,6 @@ export function ListingDetail({
               value={marketplaceTransmission(v.transmission)}
               onCopy={copy}
             />
-            {financeText && (
-              <FieldCopy
-                label="Finance"
-                value={financeText}
-                onCopy={copy}
-                multiline
-              />
-            )}
             <FieldCopy
               label="Description"
               value={m.description}
@@ -234,34 +172,6 @@ export function ListingDetail({
           <button
             type="button"
             className="btn primary"
-            onClick={() => copy("title", m.title)}
-          >
-            Copy title
-          </button>
-          <button
-            type="button"
-            className="btn"
-            onClick={() => copy("price", String(m.price))}
-          >
-            Copy price
-          </button>
-          <button
-            type="button"
-            className="btn"
-            onClick={() => copy("description", m.description)}
-          >
-            Copy description
-          </button>
-          <button
-            type="button"
-            className="btn accent"
-            onClick={() => copy("full listing", buildCopyBlock(listing))}
-          >
-            Copy all
-          </button>
-          <button
-            type="button"
-            className="btn"
             onClick={handleZip}
             disabled={busy}
           >
